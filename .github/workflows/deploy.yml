@@ -1,4 +1,4 @@
-name: Deploy FastAPI
+name: Deploy FastAPI to EC2
 
 on:
   push:
@@ -8,10 +8,22 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t fastapi-app .
-          docker run -d -p 8000:8000 fastapi-app
+          docker build -t Inioluwa16/fastapi-task-project .
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker push Inioluwa16/fastapi-task-project
+
+      - name: SSH into EC2 and deploy
+        run: |
+          ssh -i ${{ secrets.EC2_SSH_KEY }} ubuntu@13.60.74.30 "cd /path/to/your/app && docker-compose pull && docker-compose up -d"
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
