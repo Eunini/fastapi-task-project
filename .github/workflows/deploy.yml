@@ -1,0 +1,17 @@
+name: Deploy FastAPI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t fastapi-app .
+          docker run -d -p 8000:8000 fastapi-app
