@@ -24,6 +24,8 @@ jobs:
 
       - name: SSH into EC2 and deploy
         run: |
-          ssh -i ${{ secrets.EC2_SSH_KEY }} ubuntu@13.60.74.30 "cd /path/to/your/app && docker-compose pull && docker-compose up -d"
+          echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' > /tmp/ec2_ssh_key
+          chmod 600 /tmp/ec2_ssh_key
+          ssh -i /tmp/ec2_ssh_key -o StrictHostKeyChecking=no ubuntu@13.60.74.30 "cd /path/to/your/app && docker-compose pull && docker-compose up -d"
         env:
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
